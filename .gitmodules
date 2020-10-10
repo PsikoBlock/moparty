@@ -1,0 +1,3 @@
+[submodule "moparty-frontend"]
+	path = moparty-frontend
+	url = https://github.com/marioreggiori/moparty-frontend.git

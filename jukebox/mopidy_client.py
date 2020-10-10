@@ -1,4 +1,5 @@
 from mopidy_json_client import MopidyClient
+from django.conf import settings
 
 from . import models, serializers
 
@@ -11,7 +12,7 @@ backends_to_uris = {
 
 def start_client():
     global mopidy_client
-    mopidy_client = MopidyClient()
+    mopidy_client = MopidyClient(ws_url='ws://' + settings.MOPIDY_SERVER + '/mopidy/ws')
     # TODO bind events
     # mopidy_client.bind_event('track_playback_started', print_track_info)
 

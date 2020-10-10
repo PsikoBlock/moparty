@@ -14,15 +14,23 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import include, path
+from django.urls import include, path, re_path
+from django.views.generic.base import RedirectView
 from rest_framework import routers
-from jukebox import views
 
-#router = routers.DefaultRouter()
-#router.register(r'search', views.Search, basename='search')
+from jukebox import views
+from .revproxy_views import MopidyPictureProxyView
+
+router = routers.DefaultRouter()
+router.register(r'user_playlist', views.UserPlaylistViewSet)
+router.register(r'user_wishlist', views.UserWishlistViewSet)
 
 urlpatterns = [
     path('search/', views.Search.as_view()),
     path('api-auth/', include('rest_framework.urls', namespace='rest_framework')),
     path('admin/', admin.site.urls),
+    path('accounts/', include('allauth.urls')),
+    re_path(r'local/(?P<path>.*)$', MopidyPictureProxyView.as_view()),
+    path('', include(router.urls)),
+    path('', RedirectView.as_view(url='/accounts/login'), name='redirect-login')
 ]

@@ -15,7 +15,7 @@ class TrackManager(models.Manager):
         uri = mopidy_track['uri']
         from .mopidy_client import mopidy_client
         try:
-            image = mopidy_client.library.get_images([uri])[uri][0]
+            image = mopidy_client.library.get_images([uri])[uri][0]['uri']
         except IndexError:
             image = None
         track = self.model(uri=uri, data=mopidy_track, image=image, playlist=playlist, position=position)
@@ -39,6 +39,6 @@ class Track(models.Model):
 
 class UserProfile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, primary_key=True)
-    wishlist = models.OneToOneField(Playlist, on_delete=models.SET_NULL, related_name='wishlist_user', null=True)
+    wishlist = models.OneToOneField(Playlist, on_delete=models.SET_NULL, related_name='wishlist_of', null=True)
     wishlist_position = models.PositiveIntegerField(null=True)
-    playlist = models.OneToOneField(Playlist, on_delete=models.SET_NULL, related_name='playlist_user', null=True)
+    playlist = models.OneToOneField(Playlist, on_delete=models.SET_NULL, related_name='playlist_of', null=True)

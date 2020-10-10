@@ -15,15 +15,11 @@ from pathlib import Path
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+# SECURITY WARNING: don't run with debug turned on in production!
+DEBUG = True
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/3.1/howto/deployment/checklist/
-
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = '#9t-_s*at40e#ng+_)ccbtb_0hj62o7ek_^^yeim07c(ok!^nj'
-
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
 
 ALLOWED_HOSTS = []
 
@@ -37,8 +33,15 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django.contrib.sites',
+    'allauth',
+    'allauth.account',
+    'allauth.socialaccount',
+    'allauth.socialaccount.providers.discord',
+    'allauth.socialaccount.providers.spotify',
     'rest_framework',
-    'jukebox'
+    'revproxy',
+    'jukebox',
 ]
 
 MIDDLEWARE = [
@@ -56,7 +59,7 @@ ROOT_URLCONF = 'moparty.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [BASE_DIR / 'templates'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -70,6 +73,8 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'moparty.wsgi.application'
+
+SITE_ID = 1
 
 
 # Database
@@ -85,6 +90,14 @@ DATABASES = {
 
 # Password validation
 # https://docs.djangoproject.com/en/3.1/ref/settings/#auth-password-validators
+
+AUTHENTICATION_BACKENDS = [
+    # Needed to login by username in Django admin, regardless of `allauth`
+    'django.contrib.auth.backends.ModelBackend',
+
+    # `allauth` specific authentication methods, such as login by e-mail
+    'allauth.account.auth_backends.AuthenticationBackend',
+]
 
 AUTH_PASSWORD_VALIDATORS = [
     {
@@ -105,9 +118,9 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/3.1/topics/i18n/
 
-LANGUAGE_CODE = 'en-us'
+LANGUAGE_CODE = 'de-de'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'Europe/Berlin'
 
 USE_I18N = True
 
@@ -120,9 +133,34 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/3.1/howto/static-files/
 
 STATIC_URL = '/static/'
+STATIC_ROOT = BASE_DIR / 'static'
+STATICFILES_DIRS = [BASE_DIR / 'moparty-frontend' / 'build', ]
 
 
 REST_FRAMEWORK = {
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
     'PAGE_SIZE': 10
 }
+
+
+# django-allauth stuff
+# Provider specific settings
+
+
+LOGIN_REDIRECT_URL = '/static/index.html'
+
+ACCOUNT_ADAPTER = 'moparty.allauth_overrides.AccountAdapter'
+
+SOCIALACCOUNT_ADAPTER = 'moparty.allauth_overrides.SocialAccountAdapter'
+
+ACCOUNT_FORMS = {
+    'add_email': 'moparty.allauth_overrides.MemberAddEmailForm',
+    'change_password': 'moparty.allauth_overrides.MemberChangePasswordForm',
+    'set_password': 'moparty.allauth_overrides.MemberSetPasswordForm',
+    'reset_password': 'moparty.allauth_overrides.MemberResetPasswordForm',
+}
+
+
+MOPIDY_SERVER = 'localhost:6680'
+
+import local_settings
